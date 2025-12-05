@@ -1,0 +1,823 @@
+// levels.js - Упрощенная логика уровней с новым первым уровнем
+
+// Конфигурация уровней (все уровни доступны сразу)
+const LEVELS_CONFIG = [
+    {
+        id: 1,
+        name: "Сборка схемы по образцу",
+        type: "assembly",
+        timePerTask: 180, // 3 минуты на задание
+        attempts: 3, // 3 попытки на задание
+        tasks: [
+            {
+                id: 1,
+                title: "Задание 1: Простая цепь",
+                description: "Соберите схему в соответствии с образцом",
+                instructionImage: 'pics/instruction1.png',
+                circuitImage: 'pics/field.png',
+                correctPlacement: {
+                    slot1: 'switch',
+                    slot2: 'ammeter',
+                    slot3: 'bulb',
+                },
+                slotPositions: {
+                    slot1: { top: '30%', left: '27%' },
+                    slot2: { top: '65%', left: '45%' },
+                    slot3: { top: '30%', left: '64%' },
+                },
+                elements: ["switch", "ammeter", "bulb"]
+            },
+            {
+                id: 2,
+                title: "Задание 2: Цепь с амперметром",
+                description: "Соберите схему в соответствии с образцом",
+                instructionImage: 'pics/instruction2.png',
+                circuitImage: 'pics/field.png',
+                correctPlacement: {
+                    slot1: 'switch',
+                    slot2: 'bulb',
+                    slot3: 'ammeter',
+                },
+                slotPositions: {
+                    slot1: { top: '30%', left: '27%' },
+                    slot2: { top: '65%', left: '45%' },
+                    slot3: { top: '30%', left: '64%' },
+                },
+                elements: ["switch", "bulb", "ammeter"]
+            },
+            {
+                id: 3,
+                title: "Задание 3: Параллельная цепь",
+                description: "Соберите схему в соответствии с образцом",
+                instructionImage: 'pics/instruction4.png',
+                circuitImage: 'pics/field2.png',
+                correctPlacement: {
+                    slot1: 'bulb',
+                    slot2: 'ammeter',
+                    slot3: 'switch',
+                },
+                slotPositions: {
+                    slot2: { top: '20%', left: '64%' },
+                    slot1: { top: '75%', left: '45%' },
+                    slot3: { top: '50%', left: '64%' },
+                },
+                elements: ["bulb", "ammeter", "switch"]
+            }
+        ],
+        baseScore: 100
+    },
+    {
+        id: 2,
+        name: "Расчеты",
+        type: "calculation",
+        timePerTask: 120, // 2 минуты на задание
+        attempts: 3,
+        tasks: [
+            {
+                id: 1,
+                question: "Рассчитайте силу тока в цепи, если напряжение U = 12В, а сопротивление R = 4Ом",
+                formula: "I = U / R",
+                answer: 3,
+                units: "А"
+            },
+            {
+                id: 2,
+                question: "Рассчитайте напряжение, если сила тока I = 0.5А, а сопротивление R = 24Ом",
+                formula: "U = I * R",
+                answer: 12,
+                units: "В"
+            },
+            {
+                id: 3,
+                question: "Рассчитайте сопротивление, если напряжение U = 9В, а сила тока I = 0.3А",
+                formula: "R = U / I",
+                answer: 30,
+                units: "Ом"
+            }
+        ],
+        baseScore: 150
+    },
+    {
+        id: 3,
+        name: "Теория",
+        type: "quiz",
+        timePerTask: 90, // 1.5 минуты на задание
+        attempts: 3,
+        tasks: [
+            {
+                id: 1,
+                question: "Для чего нужен резистор в электрической цепи?",
+                answers: [
+                    "Для ограничения тока",
+                    "Для увеличения напряжения",
+                    "Для хранения энергии",
+                    "Для переключения цепи"
+                ],
+                correct: 0
+            },
+            {
+                id: 2,
+                question: "Какой элемент преобразует электрическую энергию в свет?",
+                answers: [
+                    "Лампа накаливания",
+                    "Резистор",
+                    "Конденсатор",
+                    "Трансформатор"
+                ],
+                correct: 0
+            },
+            {
+                id: 3,
+                question: "Что измеряется в Омах?",
+                answers: [
+                    "Сопротивление",
+                    "Напряжение",
+                    "Сила тока",
+                    "Мощность"
+                ],
+                correct: 0
+            }
+        ],
+        baseScore: 120
+    }
+];
+
+// Текущее состояние игры
+let currentGameState = {
+    playerName: "",
+    currentLevel: 1,
+    currentTask: 0,
+    currentAttempts: 3,
+    tasksCompleted: 0,
+    score: 0,
+    penalty: 0,
+    timeLeft: 0,
+    timerInterval: null,
+    workspaceElements: [],
+    circuitPlacements: {},
+    currentTaskData: null,
+    currentAnswer: null,
+    selectedAnswer: null
+};
+
+// Инициализация уровня
+function initLevel(levelId) {
+    const levelConfig = LEVELS_CONFIG.find(l => l.id === levelId);
+    if (!levelConfig) return;
+    
+    // Устанавливаем текущий уровень
+    currentGameState.currentLevel = levelId;
+    currentGameState.currentTask = 0;
+    currentGameState.currentAttempts = levelConfig.attempts;
+    currentGameState.workspaceElements = [];
+    currentGameState.circuitPlacements = {};
+    currentGameState.currentTaskData = null;
+    currentGameState.currentAnswer = null;
+    currentGameState.selectedAnswer = null;
+    
+    // Обнуляем penalty для нового уровня
+    currentGameState.penalty = 0;
+    
+    // Если это уровень 1, скрываем правую панель элементов
+    if (levelId === 1) {
+        const elementsPanel = document.getElementById('elementsPanel');
+        if (elementsPanel) {
+            elementsPanel.style.display = 'none';
+        }
+    }
+    
+    // Обновляем UI
+    updateLevelUI(levelConfig);
+    
+    // Загружаем первое задание уровня
+    loadNextTask();
+    
+    // Обновляем активную вкладку
+    updateLevelTabs();
+}
+
+// Загрузка следующего задания
+function loadNextTask() {
+    const levelConfig = LEVELS_CONFIG.find(l => l.id === currentGameState.currentLevel);
+    if (!levelConfig) return;
+    
+    // Увеличиваем номер задания
+    currentGameState.currentTask++;
+    
+    // Если задания закончились, завершаем уровень
+    if (currentGameState.currentTask > levelConfig.tasks.length) {
+        completeLevel();
+        return;
+    }
+    
+    // Сбрасываем состояние
+    currentGameState.currentAttempts = levelConfig.attempts;
+    currentGameState.workspaceElements = [];
+    currentGameState.circuitPlacements = {};
+    currentGameState.currentTaskData = null;
+    
+    // Сбрасываем таймер
+    currentGameState.timeLeft = levelConfig.timePerTask;
+    if (typeof startTimer === 'function') {
+        startTimer();
+    }
+    
+    // Получаем текущее задание
+    const task = levelConfig.tasks[currentGameState.currentTask - 1];
+    
+    // Очищаем контент
+    const taskContent = document.getElementById('taskContent');
+    taskContent.innerHTML = '';
+    
+    // Генерируем контент в зависимости от типа уровня
+    switch(levelConfig.type) {
+        case 'assembly':
+            generateAssemblyTask(task, taskContent);
+            // Скрываем правую панель элементов (она больше не нужна для этого уровня)
+            const elementsPanel = document.getElementById('elementsPanel');
+            if (elementsPanel) {
+                elementsPanel.style.display = 'none';
+            }
+            break;
+        case 'calculation':
+            generateCalculationTask(task, taskContent);
+            break;
+        case 'quiz':
+            generateQuizTask(task, taskContent);
+            break;
+    }
+    
+    // Обновляем прогресс и попытки
+    updateProgress();
+    updateAttemptsDisplay();
+    
+    // Скрываем кнопку "Следующее задание"
+    const nextBtn = document.getElementById('nextTaskBtn');
+    const checkBtn = document.getElementById('checkTaskBtn');
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (checkBtn) {
+        checkBtn.style.display = 'block';
+        checkBtn.disabled = false;
+    }
+}
+
+// Генерация задания для сборки схемы по образцу
+function generateAssemblyTask(task, container) {
+    container.innerHTML = '';
+    
+    // Создаем контейнер для задания
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'circuit-assembly-task';
+    
+    // Заголовок и описание
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'assembly-header';
+    headerDiv.innerHTML = `
+        <h3>${task.title}</h3>
+        <p>${task.description}</p>
+    `;
+    
+    // Область с инструкцией
+    const instructionDiv = document.createElement('div');
+    instructionDiv.className = 'instruction-area';
+    instructionDiv.innerHTML = `
+        <div class="instruction-title">
+            <i class="fas fa-eye"></i> Образец для сборки:
+        </div>
+        <div class="instruction-container">
+            <img id="instructionImage" src="${task.instructionImage}" alt="Образец" class="instruction-image">
+        </div>
+    `;
+    
+    // Основная игровая область
+    const gameAreaDiv = document.createElement('div');
+    gameAreaDiv.className = 'circuit-game-area';
+    
+    // Контейнер схемы
+    const circuitDiv = document.createElement('div');
+    circuitDiv.className = 'circuit-container';
+    
+    // Изображение схемы
+    const circuitImg = document.createElement('img');
+    circuitImg.id = 'circuitImage';
+    circuitImg.src = task.circuitImage;
+    circuitImg.alt = 'Схема';
+    circuitImg.className = 'circuit-image';
+    circuitDiv.appendChild(circuitImg);
+    
+    // Создаем слоты для элементов
+    for (let i = 1; i <= 3; i++) {
+        const slotId = `slot${i}`;
+        const slotDiv = document.createElement('div');
+        slotDiv.id = slotId;
+        slotDiv.className = 'circuit-slot';
+        slotDiv.dataset.slot = slotId;
+        
+        // Добавляем подсказку внутри слота
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'slot-hint';
+        hintSpan.textContent = `Слот ${i}`;
+        slotDiv.appendChild(hintSpan);
+        
+        circuitDiv.appendChild(slotDiv);
+    }
+    
+    // Контейнер для элементов (под схемой)
+    const elementsContainer = document.createElement('div');
+    elementsContainer.className = 'circuit-elements-container';
+    elementsContainer.innerHTML = `
+        <div class="elements-title">
+            <i class="fas fa-arrows-alt"></i> Перетащите элементы на схему:
+        </div>
+        <div class="elements-grid" id="circuitElements"></div>
+    `;
+    
+    // Собираем всё вместе
+    gameAreaDiv.appendChild(circuitDiv);
+    gameAreaDiv.appendChild(elementsContainer);
+    
+    taskDiv.appendChild(headerDiv);
+    taskDiv.appendChild(instructionDiv);
+    taskDiv.appendChild(gameAreaDiv);
+    
+    container.appendChild(taskDiv);
+    
+    // Устанавливаем позиции слотов после рендеринга
+    setTimeout(() => {
+        setSlotPositions(task.slotPositions);
+        
+        // Сохраняем правильный ответ
+        currentGameState.correctAnswer = task.correctPlacement;
+        currentGameState.currentTaskData = task;
+        currentGameState.circuitPlacements = {};
+        
+        // Заполняем контейнер элементов
+        const elementsGrid = elementsContainer.querySelector('.elements-grid');
+        fillCircuitElements(task.elements, elementsGrid);
+        
+        // Инициализируем drag and drop
+        initCircuitDragAndDrop();
+    }, 100);
+}
+
+// Функция для заполнения контейнера элементов
+function fillCircuitElements(elements, container) {
+    if (!container) return;
+    
+    // Очищаем контейнер
+    container.innerHTML = '';
+    
+    // Добавляем элементы из задачи
+    elements.forEach(elementId => {
+        const elementDiv = document.createElement('div');
+        elementDiv.className = 'circuit-element-draggable';
+        elementDiv.id = `element-${elementId}`;
+        elementDiv.draggable = true;
+        elementDiv.dataset.element = elementId;
+        
+        // Определяем изображение и название элемента
+        let imgSrc = '';
+        let elementName = '';
+        
+        switch(elementId) {
+            case 'bulb':
+                imgSrc = 'pics/bulb.png';
+                elementName = 'Лампочка';
+                break;
+            case 'switch':
+                imgSrc = 'pics/switch.png';
+                elementName = 'Выключатель';
+                break;
+            case 'ammeter':
+                imgSrc = 'pics/ammeter.png';
+                elementName = 'Амперметр';
+                break;
+        }
+        
+        elementDiv.innerHTML = `
+            <div class="element-icon">
+                <img src="${imgSrc}" alt="${elementName}" class="element-img">
+            </div>
+            <div class="element-name">${elementName}</div>
+        `;
+        
+        container.appendChild(elementDiv);
+    });
+}
+
+// Функция для установки позиций слотов
+function setSlotPositions(positions) {
+    for (const slotId in positions) {
+        const slot = document.getElementById(slotId);
+        if (slot) {
+            const { top, left } = positions[slotId];
+            
+            // Сбрасываем стили
+            slot.style.position = 'absolute';
+            slot.style.top = top;
+            slot.style.left = left;
+            slot.style.width = '85px';
+            slot.style.height = '85px';
+            slot.style.zIndex = '10';
+            
+            // Добавляем контур для видимости
+            slot.style.border = '2px dashed rgba(0, 210, 255, 0.7)';
+            slot.style.borderRadius = '12px';
+            slot.style.backgroundColor = 'rgba(0, 210, 255, 0.08)';
+            slot.style.display = 'flex';
+            slot.style.alignItems = 'center';
+            slot.style.justifyContent = 'center';
+        }
+    }
+}
+
+// Функция для инициализации drag and drop
+function initCircuitDragAndDrop() {
+    // Очищаем старые обработчики
+    const oldElements = document.querySelectorAll('.circuit-element-draggable');
+    const oldSlots = document.querySelectorAll('.circuit-slot');
+    
+    oldElements.forEach(el => {
+        el.removeEventListener('dragstart', handleCircuitDragStart);
+        el.removeEventListener('dragend', handleCircuitDragEnd);
+    });
+    
+    oldSlots.forEach(slot => {
+        slot.removeEventListener('dragover', handleCircuitDragOver);
+        slot.removeEventListener('drop', handleCircuitDrop);
+        slot.removeEventListener('dragleave', handleCircuitDragLeave);
+    });
+    
+    // Получаем элементы
+    const draggableElements = document.querySelectorAll('.circuit-element-draggable');
+    const dropzones = document.querySelectorAll('.circuit-slot');
+    
+    console.log('Инициализация drag and drop. Элементов:', draggableElements.length, 'Слотов:', dropzones.length);
+    
+    // Обработчики для элементов
+    draggableElements.forEach(element => {
+        element.addEventListener('dragstart', handleCircuitDragStart);
+        element.addEventListener('dragend', handleCircuitDragEnd);
+        
+        // Добавляем визуальную обратную связь
+        element.addEventListener('dragstart', function() {
+            this.classList.add('dragging');
+            console.log('Начато перетаскивание:', this.id);
+        });
+        
+        element.addEventListener('dragend', function() {
+            this.classList.remove('dragging');
+        });
+    });
+    
+    // Обработчики для слотов
+    dropzones.forEach(dropzone => {
+        dropzone.addEventListener('dragover', handleCircuitDragOver);
+        dropzone.addEventListener('drop', handleCircuitDrop);
+        dropzone.addEventListener('dragleave', handleCircuitDragLeave);
+        
+        // Визуальная обратная связь при наведении
+        dropzone.addEventListener('dragover', function() {
+            this.classList.add('drag-over');
+        });
+        
+        dropzone.addEventListener('dragleave', function() {
+            this.classList.remove('drag-over');
+        });
+        
+        dropzone.addEventListener('drop', function() {
+            this.classList.remove('drag-over');
+        });
+    });
+}
+
+// Обработчики событий для drag and drop
+function handleCircuitDragStart(event) {
+    console.log('Drag start event:', event.target.id);
+    
+    // Сохраняем данные о перетаскиваемом элементе
+    const elementId = event.target.dataset.element;
+    event.dataTransfer.setData('text/plain', elementId);
+    event.dataTransfer.effectAllowed = 'move';
+    
+    // Создаем прозрачное изображение для перетаскивания (призрак)
+    const dragGhost = event.target.cloneNode(true);
+    dragGhost.style.position = 'absolute';
+    dragGhost.style.top = '-1000px';
+    dragGhost.style.left = '-1000px';
+    dragGhost.style.opacity = '0.7';
+    dragGhost.style.transform = 'scale(0.9)';
+    dragGhost.style.zIndex = '10000';
+    dragGhost.id = 'drag-ghost';
+    dragGhost.classList.add('dragging-ghost');
+    document.body.appendChild(dragGhost);
+    
+    // Используем призрак как изображение для перетаскивания
+    event.dataTransfer.setDragImage(dragGhost, 55, 55);
+    
+    // Удаляем призрака после начала перетаскивания
+    setTimeout(() => {
+        const ghost = document.getElementById('drag-ghost');
+        if (ghost) {
+            document.body.removeChild(ghost);
+        }
+    }, 0);
+}
+
+function handleCircuitDragEnd(event) {
+    console.log('Drag end event');
+    // Удаляем призрака, если он еще есть
+    const ghost = document.getElementById('drag-ghost');
+    if (ghost) {
+        document.body.removeChild(ghost);
+    }
+}
+
+function handleCircuitDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+}
+
+function handleCircuitDragLeave(event) {
+    event.target.classList.remove('drag-over');
+}
+
+function handleCircuitDrop(event) {
+    event.preventDefault();
+    event.target.classList.remove('drag-over');
+    
+    const elementType = event.dataTransfer.getData('text/plain');
+    console.log('Drop event. Element type:', elementType, 'Target:', event.target.id);
+    
+    if (!elementType) {
+        console.error('Нет данных о перетаскиваемом элементе');
+        return;
+    }
+    
+    const dropzone = event.target.closest('.circuit-slot');
+    if (!dropzone) {
+        console.error('Цель не является слотом');
+        return;
+    }
+    
+    // Очищаем слот перед добавлением нового элемента
+    dropzone.innerHTML = '';
+    
+    // Создаем размещенный элемент
+    const placedElement = createPlacedElement(elementType);
+    dropzone.appendChild(placedElement);
+    
+    // Сохраняем размещение в состоянии игры
+    const slotId = dropzone.id;
+    currentGameState.circuitPlacements[slotId] = elementType;
+    
+    console.log('Элемент размещен в слоте:', slotId, '->', elementType);
+    console.log('Текущие размещения:', currentGameState.circuitPlacements);
+}
+
+// Функция создания размещенного элемента
+function createPlacedElement(elementType) {
+    const placedElement = document.createElement('div');
+    placedElement.className = 'placed-element';
+    placedElement.dataset.type = elementType;
+    
+    // Определяем изображение и название
+    let imgSrc = '';
+    let elementName = '';
+    
+    switch(elementType) {
+        case 'bulb':
+            imgSrc = 'pics/bulb.png';
+            elementName = 'Лампочка';
+            break;
+        case 'switch':
+            imgSrc = 'pics/switch.png';
+            elementName = 'Выключатель';
+            break;
+        case 'ammeter':
+            imgSrc = 'pics/ammeter.png';
+            elementName = 'Амперметр';
+            break;
+    }
+    
+    placedElement.innerHTML = `
+        <div class="placed-element-icon">
+            <img src="${imgSrc}" alt="${elementName}" class="placed-element-img">
+        </div>
+        <div class="placed-element-name">${elementName}</div>
+        <div class="delete-placed-element" title="Удалить элемент">×</div>
+    `;
+    
+    // Добавляем обработчик для кнопки удаления
+    const deleteBtn = placedElement.querySelector('.delete-placed-element');
+    deleteBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // Находим родительский слот
+        const slot = this.closest('.circuit-slot');
+        if (slot) {
+            // Возвращаем подсказку
+            slot.innerHTML = '<span class="slot-hint">Слот ' + slot.id.replace('slot', '') + '</span>';
+            
+            // Удаляем из состояния
+            delete currentGameState.circuitPlacements[slot.id];
+            console.log('Элемент удален из слота', slot.id);
+        }
+    });
+    
+    return placedElement;
+}
+
+// Генерация задания для расчетов
+function generateCalculationTask(task, container) {
+    container.innerHTML = `
+        <div class="calculation-task">
+            <h3>Расчет электрической цепи</h3>
+            <div class="question">${task.question}</div>
+            <div class="formula-container">
+                <span class="formula-label">Формула:</span>
+                <code class="formula">${task.formula}</code>
+            </div>
+            <div class="input-group">
+                <input type="number" id="calculationInput" placeholder="Введите ответ" step="0.01">
+                <span class="units">${task.units}</span>
+            </div>
+            <div class="calculation-hint">
+                Введите ответ с точностью до двух знаков после запятой
+            </div>
+        </div>
+    `;
+    
+    // Сохраняем правильный ответ
+    currentGameState.correctAnswer = task.answer;
+    
+    // Фокус на поле ввода
+    setTimeout(() => {
+        const input = document.getElementById('calculationInput');
+        if (input) {
+            input.focus();
+            // Добавляем обработчик для клавиши Enter
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (typeof checkTask === 'function') {
+                        checkTask();
+                    }
+                }
+            });
+        }
+    }, 100);
+}
+
+// Генерация задания для теории
+function generateQuizTask(task, container) {
+    container.innerHTML = `
+        <div class="quiz-task">
+            <h3>Теоретический вопрос</h3>
+            <div class="question">${task.question}</div>
+            <div class="answers">
+                ${task.answers.map((answer, index) => `
+                    <div class="answer-option" data-index="${index}">
+                        <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                        <span class="answer-text">${answer}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Сохраняем правильный ответ
+    currentGameState.correctAnswer = task.correct;
+    
+    // Добавляем обработчики для вариантов ответа
+    setTimeout(() => {
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                currentGameState.selectedAnswer = parseInt(this.dataset.index);
+            });
+        });
+    }, 100);
+}
+
+// Обновление UI уровня
+function updateLevelUI(levelConfig) {
+    document.getElementById('levelTitle').textContent = `Уровень ${levelConfig.id}: ${levelConfig.name}`;
+    document.getElementById('currentLevelDisplay').textContent = levelConfig.id;
+    
+    // Обновляем счетчик заданий
+    document.getElementById('tasksCompleted').textContent = currentGameState.tasksCompleted || 0;
+}
+
+// Обновление прогресс-бара
+function updateProgress() {
+    const levelConfig = LEVELS_CONFIG.find(l => l.id === currentGameState.currentLevel);
+    if (!levelConfig) return;
+    
+    const progress = (currentGameState.currentTask / levelConfig.tasks.length) * 100;
+    const progressBar = document.getElementById('levelProgress');
+    if (progressBar) {
+        progressBar.style.width = `${progress}%`;
+    }
+}
+
+// Обновление отображения попыток
+function updateAttemptsDisplay() {
+    const attemptsElement = document.getElementById('attempts');
+    if (attemptsElement) {
+        attemptsElement.textContent = currentGameState.currentAttempts;
+    }
+}
+
+// Обновление вкладок уровней
+function updateLevelTabs() {
+    document.querySelectorAll('.level-tab').forEach(tab => {
+        const level = parseInt(tab.dataset.level);
+        if (level === currentGameState.currentLevel) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    // Обновляем бургер-меню
+    document.querySelectorAll('.burger-level').forEach(item => {
+        const level = parseInt(item.dataset.level);
+        if (level === currentGameState.currentLevel) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+// Завершение уровня
+function completeLevel() {
+    // Добавляем бонусные очки за полное прохождение уровня
+    const levelConfig = LEVELS_CONFIG.find(l => l.id === currentGameState.currentLevel);
+    if (levelConfig) {
+        const bonusScore = Math.floor(levelConfig.baseScore * levelConfig.tasks.length * 0.3); // 30% бонус
+        currentGameState.score += bonusScore;
+        
+        if (typeof showMessage === 'function') {
+            showMessage(`Уровень ${currentGameState.currentLevel} пройден! Бонус: +${bonusScore} очков`, 'success');
+        }
+        if (typeof updateScore === 'function') {
+            updateScore();
+        }
+    }
+    
+    // Если это последний уровень, предлагаем завершить игру
+    if (currentGameState.currentLevel >= LEVELS_CONFIG.length) {
+        setTimeout(() => {
+            if (typeof finishGame === 'function') {
+                finishGame();
+            }
+        }, 2000);
+    } else {
+        // Предлагаем перейти на следующий уровень
+        setTimeout(() => {
+            if (confirm(`Уровень ${currentGameState.currentLevel} пройден! Перейти на уровень ${currentGameState.currentLevel + 1}?`)) {
+                initLevel(currentGameState.currentLevel + 1);
+            }
+        }, 1500);
+    }
+}
+
+// Вспомогательные функции
+function getElementName(elementId) {
+    const names = {
+        'battery': 'Батарея',
+        'resistor': 'Резистор',
+        'lamp': 'Лампочка',
+        'switch': 'Выключатель',
+        'led': 'Светодиод',
+        'relay': 'Реле',
+        'bulb': 'Лампочка',
+        'ammeter': 'Амперметр'
+    };
+    return names[elementId] || elementId;
+}
+
+function getElementIcon(elementId) {
+    const icons = {
+        'battery': '🔋',
+        'resistor': '⏚',
+        'lamp': '💡',
+        'switch': '🔘',
+        'led': '🔴',
+        'relay': '🔄',
+        'bulb': '💡',
+        'ammeter': '📊'
+    };
+    return icons[elementId] || '⚡';
+}
+
+// Экспорт функций
+window.initLevel = initLevel;
+window.loadNextTask = loadNextTask;
+window.currentGameState = currentGameState;
+window.LEVELS_CONFIG = LEVELS_CONFIG;
+window.updateAttemptsDisplay = updateAttemptsDisplay;

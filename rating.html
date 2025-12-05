@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Circuit Master - Рейтинг</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body class="rating-page">
+    <div class="rating-container">
+        <header class="rating-header">
+            <h1><i class="fas fa-crown"></i> Таблица рейтинга</h1>
+            <p>Лучшие игроки Electric Circuit Master</p>
+            <div class="rating-controls">
+                <button id="exportRatingBtn" class="btn-primary">
+                    <i class="fas fa-file-export"></i> Экспорт рейтинга (JSON)
+                </button>
+                <button id="clearRatingBtn" class="btn-danger">
+                    <i class="fas fa-trash"></i> Очистить рейтинг
+                </button>
+                <a href="index.html" class="btn-secondary">
+                    <i class="fas fa-home"></i> На главную
+                </a>
+            </div>
+        </header>
+
+        <main class="rating-main">
+            <div class="table-container">
+                <table class="rating-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Игрок</th>
+                            <th>Очки</th>
+                            <th>Задания</th>
+                            <th>Время</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratingTableBody">
+                        <!-- Данные будут вставлены через JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3><i class="fas fa-users"></i> Всего игроков</h3>
+                    <p class="stat-number" id="totalPlayers">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-chart-line"></i> Средний счет</h3>
+                    <p class="stat-number" id="averageScore">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-trophy"></i> Лучший результат</h3>
+                    <p class="stat-number" id="bestScore">0</p>
+                    <p class="stat-player" id="bestPlayer">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-bolt"></i> Всего сыграно игр</h3>
+                    <p class="stat-number" id="totalGames">0</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="rating-footer">
+            <p>Рейтинг обновляется после каждой завершенной игры. Данные хранятся в вашем браузере.</p>
+            <p class="timestamp">Последнее обновление: <span id="lastUpdate">-</span></p>
+        </footer>
+    </div>
+
+    <script src="js/rating.js"></script>
+</body>
+</html>

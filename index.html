@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Circuit Master - Вход</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-bolt logo-icon"></i>
+                <h1>Electric Circuit <span class="highlight">Master</span></h1>
+                <p class="subtitle">Пройди все уровни, собери цепи и стань гуру электротехники!</p>
+            </div>
+            <div class="auth-body">
+                <div class="input-group">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="playerName" placeholder="Введите ваше имя" maxlength="20" autocomplete="off">
+                </div>
+                <button id="startGameBtn" class="btn-primary">
+                    <i class="fas fa-play"></i> Начать игру
+                </button>
+                <div class="divider">
+                    <span>или</span>
+                </div>
+                <button id="viewRatingBtn" class="btn-secondary">
+                    <i class="fas fa-chart-line"></i> Посмотреть рейтинг
+                </button>
+                <div class="hint">
+                    <i class="fas fa-info-circle"></i> Имя будет использоваться для сохранения вашего прогресса и результатов.
+                </div>
+            </div>
+            <div class="auth-footer">
+                <p>Проект "Electric Circuit Master" | Разработка игрового приложения "Электрические схемы"</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

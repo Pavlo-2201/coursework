@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Circuit Master - Игра</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+</head>
+<body class="game-page">
+    <!-- Верхнее меню с уровнями -->
+    <nav class="top-levels-nav" id="topLevelsNav">
+        <div class="levels-container">
+            <div class="level-tab" data-level="1">
+                <i class="fas fa-puzzle-piece"></i>
+                <span>Сборка схем</span>
+            </div>
+            <div class="level-tab" data-level="2">
+                <i class="fas fa-calculator"></i>
+                <span>Расчеты</span>
+            </div>
+            <div class="level-tab" data-level="3">
+                <i class="fas fa-question-circle"></i>
+                <span>Теория</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Бургер-меню для мобильных устройств -->
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-icon" id="burgerIcon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav class="burger-nav" id="burgerNav" style="display: none;">
+            <ul>
+                <li><a href="#" class="burger-level" data-level="1"><i class="fas fa-puzzle-piece"></i> Сборка схем</a></li>
+                <li><a href="#" class="burger-level" data-level="2"><i class="fas fa-calculator"></i> Расчеты</a></li>
+                <li><a href="#" class="burger-level" data-level="3"><i class="fas fa-question-circle"></i> Теория</a></li>
+                <li class="divider"></li>
+                <li><a href="index.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li><a href="rating.html"><i class="fas fa-chart-line"></i> Рейтинг</a></li>
+                <li><a href="#" id="restartGame"><i class="fas fa-redo"></i> Начать заново</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Основной контейнер игры -->
+    <div class="game-container">
+        <!-- Панель игрока и таймера -->
+        <header class="game-header">
+            <div class="player-info">
+                <span class="player-name" id="displayPlayerName">Игрок</span>
+                <span class="score" id="score">Очки: <strong>0</strong></span>
+            </div>
+            <div class="level-info">
+                <span class="level-title" id="levelTitle">Уровень 1: Сборка схемы</span>
+                <div class="progress-container">
+                    <div class="progress-bar" id="levelProgress"></div>
+                </div>
+            </div>
+            <div class="timer-penalty">
+                <div class="timer">
+                    <i class="fas fa-clock"></i> <span id="timer">05:00</span>
+                </div>
+                <div class="penalty">
+                    <i class="fas fa-exclamation-triangle"></i> Штраф: <span id="penalty">0</span>
+                </div>
+                <button id="finishGameBtn" class="btn-small btn-warning">
+                    <i class="fas fa-flag-checkered"></i> Завершить игру
+                </button>
+            </div>
+        </header>
+
+        <!-- Основная игровая область -->
+        <main class="game-main">
+            <!-- Центральная область с заданием -->
+            <div class="task-center-area">
+                <div class="task-header">
+                    <h2><i class="fas fa-tasks"></i> Задание</h2>
+                    <div class="attempts">
+                        Попытки: <span id="attempts">3</span> из 3
+                    </div>
+                </div>
+                
+                <!-- Контейнер для задания (меняется в зависимости от уровня) -->
+                <div class="task-content" id="taskContent">
+                    <!-- Содержимое будет подставляться динамически -->
+                </div>
+                
+                <!-- Кнопки управления -->
+                <div class="task-controls">
+                    <button id="checkTaskBtn" class="btn-control btn-success">
+                        <i class="fas fa-check-circle"></i> Проверить
+                    </button>
+                    <button id="nextTaskBtn" class="btn-control btn-primary" style="display: none;">
+                        <i class="fas fa-forward"></i> Следующее задание
+                    </button>
+                </div>
+                
+                <!-- Сообщения -->
+                <div class="message-box" id="messageBox">
+                    <!-- Сообщения о правильности/неправильности ответа -->
+                </div>
+            </div>
+
+            <!-- Боковая панель с элементами (только для уровня 1) -->
+            <div class="elements-side-panel" id="elementsPanel" style="display: none;">
+                <div class="panel-header">
+                    <h3><i class="fas fa-puzzle-piece"></i> Элементы для сборки</h3>
+                    <button id="clearWorkspaceBtn" class="btn-small btn-danger">
+                        <i class="fas fa-trash-alt"></i> Очистить
+                    </button>
+                </div>
+                <div class="elements-container" id="elementsContainer">
+                    <!-- Элементы будут добавляться динамически -->
+                </div>
+                <div class="panel-hint">
+                    <i class="fas fa-info-circle"></i> Перетащите элементы в рабочую область слева
+                </div>
+            </div>
+        </main>
+
+        <!-- Панель с рейтингом текущей игры -->
+        <footer class="game-footer">
+            <div class="current-stats">
+                <div class="stat-item">
+                    <span>Задания выполнено:</span>
+                    <strong id="tasksCompleted">0</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Время:</span>
+                    <strong id="currentTime">00:00</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Текущий уровень:</span>
+                    <strong id="currentLevelDisplay">1</strong>
+                </div>
+            </div>
+            <button id="saveAndExitBtn" class="btn-secondary">
+                <i class="fas fa-save"></i> Сохранить и выйти
+            </button>
+        </footer>
+    </div>
+
+    <!-- Модальное окно завершения задания -->
+    <div class="modal-overlay" id="taskCompleteModal" style="display:none;">
+        <div class="modal">
+            <h2><i class="fas fa-check-circle"></i> Задание выполнено!</h2>
+            <div class="modal-stats">
+                <p>Задание выполнено правильно!</p>
+                <p>Получено очков: <span id="taskScore">100</span></p>
+                <p>Следующее задание через: <span id="countdown">3</span> сек.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно завершения игры -->
+    <div class="modal-overlay" id="gameOverModal" style="display:none;">
+        <div class="modal">
+            <h2><i class="fas fa-gamepad"></i> Игра завершена!</h2>
+            <div class="modal-stats">
+                <p>Общий счет: <span id="finalScore">0</span></p>
+                <p>Выполнено заданий: <span id="totalTasksCompleted">0</span></p>
+                <p>Время игры: <span id="totalTime">00:00</span></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="playAgainBtn" class="btn-primary">Играть снова</button>
+                <button id="goToRatingBtn" class="btn-secondary">Перейти к рейтингу</button>
+                <button id="goToHomeBtn" class="btn-secondary">На главную</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение библиотек и скриптов -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/rating.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
