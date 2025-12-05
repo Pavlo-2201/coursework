@@ -677,9 +677,9 @@ function checkTask() {
             break;
             
         case 'calculation':
-            console.log('Проверка расчета');
+            console.log('Проверка расчета (новый формат)');
             isCorrect = checkCalculationTask();
-            message = isCorrect ? 'Ответ правильный!' : 'Ответ неправильный!';
+            message = isCorrect ? 'Формула заполнена правильно!' : 'Ошибки в заполнении формулы!';
             break;
             
         case 'quiz':
@@ -733,7 +733,7 @@ function checkTask() {
                 loadNextTask();
                 const checkBtn = document.getElementById('checkTaskBtn');
                 if (checkBtn) checkBtn.disabled = false;
-            }, 2000);
+            }, 500);
         }
         
         // Обновляем отображение попыток и штрафа
@@ -795,22 +795,33 @@ function checkAssemblyTask() {
     return isCorrect;
 }
 
-// Проверка расчета
+// Проверка расчета (чистый формат)
 function checkCalculationTask() {
-    const input = document.getElementById('calculationInput');
-    if (!input || !input.value) return false;
+    const task = currentGameState.currentTaskData;
+    if (!task) return false;
     
-    const userAnswer = parseFloat(input.value);
-    const correctAnswer = currentGameState.correctAnswer;
+    let allCorrect = true;
     
-    // Проверяем, что введено число
-    if (isNaN(userAnswer)) return false;
+    // Проверяем известные переменные
+    for (const [variable, info] of Object.entries(task.variables)) {
+        const userValue = currentGameState.formulaValues[variable];
+        const tolerance = info.value * 0.01; // 1% погрешность
+        
+        if (userValue === undefined || Math.abs(userValue - info.value) > tolerance) {
+            allCorrect = false;
+        }
+    }
     
-    // Допустимая погрешность 1%
-    const tolerance = Math.abs(correctAnswer * 0.01);
-    return Math.abs(userAnswer - correctAnswer) <= tolerance;
+    // Проверяем целевую переменную
+    const targetValue = currentGameState.formulaValues[task.targetVariable];
+    const targetTolerance = task.answer * 0.01;
+    
+    if (targetValue === undefined || Math.abs(targetValue - task.answer) > targetTolerance) {
+        allCorrect = false;
+    }
+    
+    return allCorrect;
 }
-
 // Проверка теста
 function checkQuizTask() {
     return currentGameState.selectedAnswer === currentGameState.correctAnswer;

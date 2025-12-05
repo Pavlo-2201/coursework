@@ -43,7 +43,7 @@ const LEVELS_CONFIG = [
                     slot2: { top: '65%', left: '45%' },
                     slot3: { top: '30%', left: '64%' },
                 },
-                elements: ["switch", "bulb", "ammeter"]
+                elements: ["switch", "bulb", "ammeter", "resistor"]
             },
             {
                 id: 3,
@@ -61,41 +61,56 @@ const LEVELS_CONFIG = [
                     slot1: { top: '75%', left: '45%' },
                     slot3: { top: '50%', left: '64%' },
                 },
-                elements: ["bulb", "ammeter", "switch"]
+                elements: ["battery", "bulb", "ammeter", "switch", "resistor"]
             }
         ],
         baseScore: 100
     },
     {
-        id: 2,
-        name: "Расчеты",
-        type: "calculation",
-        timePerTask: 120, // 2 минуты на задание
-        attempts: 3,
-        tasks: [
-            {
-                id: 1,
-                question: "Рассчитайте силу тока в цепи, если напряжение U = 12В, а сопротивление R = 4Ом",
-                formula: "I = U / R",
-                answer: 3,
-                units: "А"
+    id: 2,
+    name: "Расчеты",
+    type: "calculation",
+    timePerTask: 120,
+    attempts: 3,
+    tasks: [
+        {
+            id: 1,
+            question: "Рассчитайте силу тока в цепи с напряжением 12В и сопротивлением 4Ом",
+            formula: "I = U / R",
+            variables: {
+                'U': { value: 12, unit: 'В' },
+                'R': { value: 4, unit: 'Ом' }
             },
-            {
-                id: 2,
-                question: "Рассчитайте напряжение, если сила тока I = 0.5А, а сопротивление R = 24Ом",
-                formula: "U = I * R",
-                answer: 12,
-                units: "В"
+            targetVariable: 'I',
+            targetUnit: 'А',
+            answer: 3
+        },
+        {
+            id: 2,
+            question: "Рассчитайте напряжение в цепи с силой тока 0.5А и сопротивлением 24Ом",
+            formula: "U = I * R",
+            variables: {
+                'I': { value: 0.5, unit: 'А' },
+                'R': { value: 24, unit: 'Ом' }
             },
-            {
-                id: 3,
-                question: "Рассчитайте сопротивление, если напряжение U = 9В, а сила тока I = 0.3А",
-                formula: "R = U / I",
-                answer: 30,
-                units: "Ом"
-            }
-        ],
-        baseScore: 150
+            targetVariable: 'U',
+            targetUnit: 'В',
+            answer: 12
+        },
+        {
+            id: 3,
+            question: "Рассчитайте сопротивление цепи с напряжением 9В и силой тока 0.3А",
+            formula: "R = U / I",
+            variables: {
+                'U': { value: 9, unit: 'В' },
+                'I': { value: 0.3, unit: 'А' }
+            },
+            targetVariable: 'R',
+            targetUnit: 'Ом',
+            answer: 30
+        }
+    ],
+    baseScore: 150
     },
     {
         id: 3,
@@ -360,48 +375,41 @@ function generateAssemblyTask(task, container) {
     }, 100);
 }
 
-// Функция для заполнения контейнера элементов
 function fillCircuitElements(elements, container) {
     if (!container) return;
     
-    // Очищаем контейнер
     container.innerHTML = '';
+    
+    // Все возможные элементы
+    const allElements = [
+        { id: 'bulb', name: 'Лампочка', img: 'pics/bulb.png' },
+        { id: 'switch', name: 'Выключатель', img: 'pics/switch.png' },
+        { id: 'ammeter', name: 'Амперметр', img: 'pics/ammeter.png' },
+        { id: 'resistor', name: 'Резистор', img: 'pics/resistor.png' },
+        { id: 'battery', name: 'Батарея', img: 'pics/battery.png' },
+        { id: 'led', name: 'Светодиод', img: 'pics/led.png' },
+        { id: 'relay', name: 'Реле', img: 'pics/relay.png' }
+    ];
     
     // Добавляем элементы из задачи
     elements.forEach(elementId => {
-        const elementDiv = document.createElement('div');
-        elementDiv.className = 'circuit-element-draggable';
-        elementDiv.id = `element-${elementId}`;
-        elementDiv.draggable = true;
-        elementDiv.dataset.element = elementId;
-        
-        // Определяем изображение и название элемента
-        let imgSrc = '';
-        let elementName = '';
-        
-        switch(elementId) {
-            case 'bulb':
-                imgSrc = 'pics/bulb.png';
-                elementName = 'Лампочка';
-                break;
-            case 'switch':
-                imgSrc = 'pics/switch.png';
-                elementName = 'Выключатель';
-                break;
-            case 'ammeter':
-                imgSrc = 'pics/ammeter.png';
-                elementName = 'Амперметр';
-                break;
+        const elementData = allElements.find(el => el.id === elementId);
+        if (elementData) {
+            const elementDiv = document.createElement('div');
+            elementDiv.className = 'circuit-element-draggable';
+            elementDiv.id = `element-${elementId}`;
+            elementDiv.draggable = true;
+            elementDiv.dataset.element = elementId;
+            
+            elementDiv.innerHTML = `
+                <div class="element-icon">
+                    <img src="${elementData.img}" alt="${elementData.name}" class="element-img">
+                </div>
+                <div class="element-name">${elementData.name}</div>
+            `;
+            
+            container.appendChild(elementDiv);
         }
-        
-        elementDiv.innerHTML = `
-            <div class="element-icon">
-                <img src="${imgSrc}" alt="${elementName}" class="element-img">
-            </div>
-            <div class="element-name">${elementName}</div>
-        `;
-        
-        container.appendChild(elementDiv);
     });
 }
 
@@ -628,45 +636,249 @@ function createPlacedElement(elementType) {
     return placedElement;
 }
 
-// Генерация задания для расчетов
+// Генерация задания для расчетов (новый формат - чистый, по центру)
 function generateCalculationTask(task, container) {
-    container.innerHTML = `
-        <div class="calculation-task">
-            <h3>Расчет электрической цепи</h3>
-            <div class="question">${task.question}</div>
-            <div class="formula-container">
-                <span class="formula-label">Формула:</span>
-                <code class="formula">${task.formula}</code>
-            </div>
-            <div class="input-group">
-                <input type="number" id="calculationInput" placeholder="Введите ответ" step="0.01">
-                <span class="units">${task.units}</span>
-            </div>
-            <div class="calculation-hint">
-                Введите ответ с точностью до двух знаков после запятой
-            </div>
-        </div>
+    container.innerHTML = '';
+    
+    // Создаем контейнер для задания
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'calculation-task-new';
+    
+    // Заголовок задачи (центрированный)
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'calculation-header';
+    headerDiv.innerHTML = `
+        <h3>${task.question}</h3>
     `;
     
-    // Сохраняем правильный ответ
-    currentGameState.correctAnswer = task.answer;
+    // Контейнер для формулы и ввода (всё по центру)
+    const formulaContainer = document.createElement('div');
+    formulaContainer.className = 'formula-main-container';
     
-    // Фокус на поле ввода
-    setTimeout(() => {
-        const input = document.getElementById('calculationInput');
-        if (input) {
-            input.focus();
-            // Добавляем обработчик для клавиши Enter
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    if (typeof checkTask === 'function') {
-                        checkTask();
-                    }
-                }
-            });
+    // Формула с пустыми полями (чистый вид)
+    const formulaDiv = document.createElement('div');
+    formulaDiv.className = 'formula-with-inputs-clean';
+    
+    // Разбираем формулу на части
+    const formulaParts = task.formula.split(/([=*/+-])/);
+    
+    // Создаем элементы формулы
+    formulaParts.forEach((part, index) => {
+        const trimmedPart = part.trim();
+        
+        if (task.variables[trimmedPart] || trimmedPart === task.targetVariable) {
+            // Это переменная - создаем поле ввода
+            const inputWrapper = document.createElement('div');
+            inputWrapper.className = 'formula-input-wrapper-clean';
+            
+            const isTarget = trimmedPart === task.targetVariable;
+            
+            // Создаем поле ввода
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'formula-input-clean';
+            input.dataset.variable = trimmedPart;
+            if (isTarget) input.dataset.isTarget = 'true';
+            input.placeholder = '?';
+            input.step = '0.01';
+            
+            // Метка переменной (над полем)
+            const label = document.createElement('div');
+            label.className = 'variable-label-clean';
+            label.textContent = trimmedPart;
+            
+            // Единицы измерения (под полем)
+            const units = document.createElement('div');
+            units.className = 'variable-units-clean';
+            
+            if (isTarget) {
+                units.textContent = task.targetUnit;
+            } else {
+                units.textContent = task.variables[trimmedPart].unit;
+            }
+            
+            inputWrapper.appendChild(label);
+            inputWrapper.appendChild(input);
+            inputWrapper.appendChild(units);
+            
+            formulaDiv.appendChild(inputWrapper);
+            
+        } else if (trimmedPart && !['=', '+', '-', '*', '/'].includes(trimmedPart)) {
+            // Это оператор или константа
+            const operatorSpan = document.createElement('span');
+            operatorSpan.className = 'formula-operator-clean';
+            operatorSpan.textContent = trimmedPart;
+            formulaDiv.appendChild(operatorSpan);
+        } else if (['=', '+', '-', '*', '/'].includes(trimmedPart)) {
+            // Математический оператор
+            const operatorSpan = document.createElement('span');
+            operatorSpan.className = 'math-operator-clean';
+            operatorSpan.textContent = trimmedPart;
+            formulaDiv.appendChild(operatorSpan);
         }
+    });
+    
+    // Прогресс-бар (чистый вид)
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'formula-progress-clean';
+    progressDiv.innerHTML = `
+        <div class="progress-bar-clean">
+            <div class="progress-fill-clean" style="width: 0%"></div>
+        </div>
+        <div class="progress-percent-clean">0%</div>
+    `;
+    // Собираем всё вместе
+    formulaContainer.appendChild(formulaDiv);
+    formulaContainer.appendChild(progressDiv);
+    
+    taskDiv.appendChild(headerDiv);
+    taskDiv.appendChild(formulaContainer);
+    
+    container.appendChild(taskDiv);
+    
+    // Сохраняем данные задания
+    currentGameState.correctAnswer = task.answer;
+    currentGameState.currentTaskData = task;
+    currentGameState.formulaProgress = 0;
+    currentGameState.formulaValues = {};
+    
+    // Инициализируем обработчики
+    setTimeout(() => {
+        initFormulaInputsClean();
+        initFormulaProgressClean();
     }, 100);
 }
+
+// Инициализация полей ввода формулы (чистый вариант)
+function initFormulaInputsClean() {
+    const inputs = document.querySelectorAll('.formula-input-clean');
+    
+    inputs.forEach(input => {
+        // Обработчик изменения значения
+        input.addEventListener('input', function() {
+            const variable = this.dataset.variable;
+            const value = parseFloat(this.value);
+            
+            if (!isNaN(value)) {
+                currentGameState.formulaValues[variable] = value;
+                this.classList.remove('empty');
+            } else {
+                delete currentGameState.formulaValues[variable];
+                this.classList.add('empty');
+            }
+            
+            // Обновляем прогресс
+            updateFormulaProgressClean();
+            
+            // Проверяем, можно ли активировать кнопку проверки
+            checkFormulaCompletionClean();
+        });
+        
+        // Подсветка при фокусе
+        input.addEventListener('focus', function() {
+            this.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.classList.remove('focused');
+        });
+        
+        // Изначально помечаем как пустое
+        input.classList.add('empty');
+    });
+}
+
+// Инициализация прогресс-бара формулы (чистый вариант)
+function initFormulaProgressClean() {
+    const task = currentGameState.currentTaskData;
+    if (!task) return;
+    
+    // Вычисляем общее количество полей для заполнения
+    const totalFields = Object.keys(task.variables).length + 1; // +1 для целевой переменной
+    currentGameState.totalFormulaFields = totalFields;
+    
+    updateFormulaProgressClean();
+}
+
+// Обновление прогресс-бара (чистый вариант)
+function updateFormulaProgressClean() {
+    const progressFill = document.querySelector('.progress-fill-clean');
+    const progressPercent = document.querySelector('.progress-percent-clean');
+    
+    if (!progressFill || !progressPercent) return;
+    
+    const task = currentGameState.currentTaskData;
+    if (!task) return;
+    
+    // Считаем правильно заполненные поля
+    let correctFields = 0;
+    const allFields = Object.keys(task.variables).length + 1;
+    
+    // Проверяем известные переменные
+    for (const [variable, info] of Object.entries(task.variables)) {
+        const userValue = currentGameState.formulaValues[variable];
+        if (userValue !== undefined && Math.abs(userValue - info.value) <= info.value * 0.01) {
+            correctFields++;
+            
+            // Подсвечиваем правильное поле
+            const input = document.querySelector(`.formula-input-clean[data-variable="${variable}"]`);
+            if (input) {
+                input.classList.remove('incorrect', 'empty');
+                input.classList.add('correct');
+            }
+        } else if (userValue !== undefined) {
+            // Неправильное значение
+            const input = document.querySelector(`.formula-input-clean[data-variable="${variable}"]`);
+            if (input) {
+                input.classList.remove('correct');
+                input.classList.add('incorrect');
+            }
+        }
+    }
+    
+    // Проверяем целевую переменную (ответ)
+    const targetValue = currentGameState.formulaValues[task.targetVariable];
+    if (targetValue !== undefined && Math.abs(targetValue - task.answer) <= task.answer * 0.01) {
+        correctFields++;
+        
+        const input = document.querySelector(`.formula-input-clean[data-variable="${task.targetVariable}"]`);
+        if (input) {
+            input.classList.remove('incorrect', 'empty');
+            input.classList.add('correct');
+        }
+    } else if (targetValue !== undefined) {
+        const input = document.querySelector(`.formula-input-clean[data-variable="${task.targetVariable}"]`);
+        if (input) {
+            input.classList.remove('correct');
+            input.classList.add('incorrect');
+        }
+    }
+    
+    // Вычисляем прогресс
+    const progress = Math.round((correctFields / allFields) * 100);
+    currentGameState.formulaProgress = progress;
+    
+    // Обновляем UI
+    progressFill.style.width = `${progress}%`;
+    progressPercent.textContent = `${progress}%`;
+    
+    // Меняем цвет в зависимости от прогресса
+    if (progress < 33) {
+        progressFill.style.background = 'var(--danger-color)';
+        progressPercent.style.color = 'var(--danger-color)';
+    } else if (progress < 66) {
+        progressFill.style.background = 'var(--warning-color)';
+        progressPercent.style.color = 'var(--warning-color)';
+    } else if (progress < 100) {
+        progressFill.style.background = '#ffcc00';
+        progressPercent.style.color = '#ffcc00';
+    } else {
+        progressFill.style.background = 'var(--success-color)';
+        progressPercent.style.color = 'var(--success-color)';
+    }
+}
+
+
 
 // Генерация задания для теории
 function generateQuizTask(task, container) {
