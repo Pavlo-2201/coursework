@@ -916,7 +916,7 @@ function generateQuizTask(task, container) {
 
 // Обновление UI уровня
 function updateLevelUI(levelConfig) {
-    document.getElementById('levelTitle').textContent = `Уровень ${levelConfig.id}: ${levelConfig.name}`;
+    // Убрали обновление levelTitle в хедере
     document.getElementById('currentLevelDisplay').textContent = levelConfig.id;
     
     // Обновляем счетчик заданий

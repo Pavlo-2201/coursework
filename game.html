@@ -13,18 +13,39 @@
 <body class="game-page">
     <!-- Верхнее меню с уровнями -->
     <nav class="top-levels-nav" id="topLevelsNav">
-        <div class="levels-container">
-            <div class="level-tab" data-level="1">
-                <i class="fas fa-puzzle-piece"></i>
-                <span>Сборка схем</span>
+        <div class="levels-header-container">
+            <!-- Левая часть: имя и очки -->
+            <div class="levels-left">
+                <div class="player-name-levels" id="displayPlayerName">Игрок</div>
+                <div class="score-levels" id="score">Очки: <strong>0</strong></div>
             </div>
-            <div class="level-tab" data-level="2">
-                <i class="fas fa-calculator"></i>
-                <span>Расчеты</span>
+            
+            <!-- Центр: вкладки уровней -->
+            <div class="levels-center">
+                <div class="levels-container">
+                    <div class="level-tab" data-level="1">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>Сборка схем</span>
+                    </div>
+                    <div class="level-tab" data-level="2">
+                        <i class="fas fa-calculator"></i>
+                        <span>Расчеты</span>
+                    </div>
+                    <div class="level-tab" data-level="3">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Теория</span>
+                    </div>
+                </div>
             </div>
-            <div class="level-tab" data-level="3">
-                <i class="fas fa-question-circle"></i>
-                <span>Теория</span>
+            
+            <!-- Правая часть: время и штраф -->
+            <div class="levels-right">
+                <div class="timer-levels">
+                    <i class="fas fa-clock"></i> <span id="timer">05:00</span>
+                </div>
+                <div class="penalty-levels">
+                    <i class="fas fa-exclamation-triangle"></i> Штраф: <span id="penalty">0</span>
+                </div>
             </div>
         </div>
     </nav>
@@ -53,27 +74,6 @@
     <div class="game-container">
         <!-- Панель игрока и таймера -->
         <header class="game-header">
-            <div class="player-info">
-                <span class="player-name" id="displayPlayerName">Игрок</span>
-                <span class="score" id="score">Очки: <strong>0</strong></span>
-            </div>
-            <div class="level-info">
-                <span class="level-title" id="levelTitle">Уровень 1: Сборка схемы</span>
-                <div class="progress-container">
-                    <div class="progress-bar" id="levelProgress"></div>
-                </div>
-            </div>
-            <div class="timer-penalty">
-                <div class="timer">
-                    <i class="fas fa-clock"></i> <span id="timer">05:00</span>
-                </div>
-                <div class="penalty">
-                    <i class="fas fa-exclamation-triangle"></i> Штраф: <span id="penalty">0</span>
-                </div>
-                <button id="finishGameBtn" class="btn-small btn-warning">
-                    <i class="fas fa-flag-checkered"></i> Завершить игру
-                </button>
-            </div>
         </header>
 
         <!-- Основная игровая область -->
@@ -141,9 +141,14 @@
                     <strong id="currentLevelDisplay">1</strong>
                 </div>
             </div>
-            <button id="saveAndExitBtn" class="btn-secondary">
-                <i class="fas fa-save"></i> Сохранить и выйти
-            </button>
+            <div class="footer-buttons">
+                <button id="saveAndExitBtn" class="btn-secondary">
+                    <i class="fas fa-save"></i> Сохранить и выйти
+                </button>
+                <button id="finishGameBtn" class="btn-warning">
+                    <i class="fas fa-flag-checkered"></i> Завершить игру
+                </button>
+            </div>
         </footer>
     </div>
 

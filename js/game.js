@@ -13,13 +13,16 @@ function initGame() {
     // Получение имени игрока
     const playerName = localStorage.getItem('circuitPlayerName') || 'Игрок';
     currentGameState.playerName = playerName;
-    document.getElementById('displayPlayerName').textContent = playerName;
+    
+    // Обновляем имя в новом месте
+    const displayName = document.getElementById('displayPlayerName');
+    if (displayName) displayName.textContent = playerName;
+    
+    // Обновляем отображение очков
+    updateScore();
     
     // Инициализация первого уровня
     initLevel(1);
-    
-    // Обновление счета
-    updateScore();
 }
 
 // Настройка обработчиков событий
@@ -948,12 +951,12 @@ function showMessage(text, type) {
 
 // Обновление счета
 function updateScore() {
-    const scoreElement = document.getElementById('score');
+    const scoreElement = document.querySelector('.score-levels strong');
     const penaltyElement = document.getElementById('penalty');
     const tasksElement = document.getElementById('tasksCompleted');
     
     if (scoreElement) {
-        scoreElement.innerHTML = `Очки: <strong>${currentGameState.score || 0}</strong>`;
+        scoreElement.textContent = currentGameState.score || 0;
     }
     
     if (penaltyElement) {
