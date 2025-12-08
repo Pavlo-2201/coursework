@@ -21,9 +21,9 @@ const LEVELS_CONFIG = [
                     slot3: 'bulb',
                 },
                 slotPositions: {
-                    slot1: { top: '30%', left: '27%' },
-                    slot2: { top: '65%', left: '45%' },
-                    slot3: { top: '30%', left: '64%' },
+                    slot1: { top: '30%', left: '21%' },
+                    slot2: { top: '63%', left: '45%' },
+                    slot3: { top: '30%', left: '67%' },
                 },
                 elements: ["switch", "ammeter", "bulb"]
             },
@@ -39,9 +39,9 @@ const LEVELS_CONFIG = [
                     slot3: 'ammeter',
                 },
                 slotPositions: {
-                    slot1: { top: '30%', left: '27%' },
-                    slot2: { top: '65%', left: '45%' },
-                    slot3: { top: '30%', left: '64%' },
+                    slot1: { top: '30%', left: '21%' },
+                    slot2: { top: '63%', left: '45%' },
+                    slot3: { top: '30%', left: '67%' },
                 },
                 elements: ["switch", "bulb", "ammeter", "resistor"]
             },
@@ -57,9 +57,9 @@ const LEVELS_CONFIG = [
                     slot3: 'switch',
                 },
                 slotPositions: {
-                    slot2: { top: '20%', left: '64%' },
-                    slot1: { top: '75%', left: '45%' },
-                    slot3: { top: '50%', left: '64%' },
+                    slot2: { top: '20%', left: '67%' },
+                    slot1: { top: '74%', left: '43%' },
+                    slot3: { top: '48%', left: '67%' },
                 },
                 elements: ["battery", "bulb", "ammeter", "switch", "resistor"]
             }
@@ -351,7 +351,6 @@ function generateAssemblyTask(task, container) {
     gameAreaDiv.appendChild(circuitDiv);
     gameAreaDiv.appendChild(elementsContainer);
     
-    taskDiv.appendChild(headerDiv);
     taskDiv.appendChild(instructionDiv);
     taskDiv.appendChild(gameAreaDiv);
     
@@ -424,8 +423,8 @@ function setSlotPositions(positions) {
             slot.style.position = 'absolute';
             slot.style.top = top;
             slot.style.left = left;
-            slot.style.width = '85px';
-            slot.style.height = '85px';
+            slot.style.width = '55px';
+            slot.style.height = '55px';
             slot.style.zIndex = '10';
             
             // Добавляем контур для видимости
@@ -589,30 +588,31 @@ function createPlacedElement(elementType) {
     placedElement.className = 'placed-element';
     placedElement.dataset.type = elementType;
     
-    // Определяем изображение и название
+    // Определяем изображение
     let imgSrc = '';
-    let elementName = '';
     
     switch(elementType) {
         case 'bulb':
             imgSrc = 'pics/bulb.png';
-            elementName = 'Лампочка';
             break;
         case 'switch':
             imgSrc = 'pics/switch.png';
-            elementName = 'Выключатель';
             break;
         case 'ammeter':
             imgSrc = 'pics/ammeter.png';
-            elementName = 'Амперметр';
+            break;
+        case 'resistor':
+            imgSrc = 'pics/resistor.png';
+            break;
+        case 'battery':
+            imgSrc = 'pics/battery.png';
             break;
     }
     
     placedElement.innerHTML = `
         <div class="placed-element-icon">
-            <img src="${imgSrc}" alt="${elementName}" class="placed-element-img">
+            <img src="${imgSrc}" alt="" class="placed-element-img">
         </div>
-        <div class="placed-element-name">${elementName}</div>
         <div class="delete-placed-element" title="Удалить элемент">×</div>
     `;
     
