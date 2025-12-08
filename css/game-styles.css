@@ -326,8 +326,8 @@
 /* Слоты для элементов */
 .circuit-slot {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -442,8 +442,8 @@
 }
 
 .placed-element .placed-element-img {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     margin-bottom: 2px;
 }
@@ -1119,5 +1119,192 @@ body.dragging {
 @media (min-width: 769px) {
     .burger-menu {
         display: none;
+    }
+}
+/* Трехколоночная структура для уровня 1 */
+.circuit-three-column-layout {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    flex: 1;
+}
+
+.circuit-column-left,
+.circuit-column-center,
+.circuit-column-right {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+/* Левая колонка: Образец */
+.circuit-column-left {
+    width: 25%;
+    background: rgba(0, 210, 255, 0.05);
+    border: 1px solid rgba(0, 210, 255, 0.1);
+}
+
+.circuit-column-left .instruction-area {
+    margin-bottom: 0;
+}
+
+.circuit-column-left .instruction-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.circuit-column-left .instruction-image {
+    max-width: 100%;
+    max-height: 180px;
+}
+
+/* Центральная колонка: Схема */
+.circuit-column-center {
+    width: 45%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circuit-column-center .circuit-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+    padding: 15px;
+    margin: 0;
+}
+
+.circuit-column-center .circuit-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Правая колонка: Элементы */
+.circuit-column-right {
+    width: 30%;
+    background: rgba(0, 210, 255, 0.05);
+    border: 1px solid rgba(0, 210, 255, 0.1);
+}
+
+.circuit-column-right .circuit-elements-container {
+    margin-top: 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    margin: 0;
+}
+
+.circuit-column-right .elements-title {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.circuit-column-right .elements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    justify-items: center;
+}
+
+.circuit-column-right .circuit-element-draggable {
+    width: 85px;
+    height: 85px;
+    padding: 8px;
+}
+
+.circuit-column-right .circuit-element-draggable .element-img {
+    width: 45px;
+    height: 45px;
+}
+
+.circuit-column-right .circuit-element-draggable .element-name {
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+/* Уменьшаем слоты для новой компоновки */
+.circuit-slot {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed rgba(0, 210, 255, 0.7);
+    border-radius: 10px;
+    background: rgba(0, 210, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.circuit-slot .slot-hint {
+    color: rgba(0, 210, 255, 0.7);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.circuit-slot.drag-over {
+    background: rgba(0, 210, 255, 0.3);
+    border-color: var(--success-color);
+    border-style: solid;
+}
+
+/* Адаптивность для трехколоночной версии */
+@media (max-width: 1024px) {
+    .circuit-three-column-layout {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .circuit-column-left,
+    .circuit-column-center,
+    .circuit-column-right {
+        width: 100%;
+    }
+    
+    .circuit-column-center .circuit-container {
+        min-height: 200px;
+    }
+    
+    .circuit-column-left .instruction-image {
+        max-height: 150px;
+    }
+    
+    .circuit-column-right .elements-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .circuit-three-column-layout {
+        gap: 10px;
+    }
+    
+    .circuit-column-center .circuit-container {
+        min-height: 180px;
+    }
+    
+    .circuit-column-left .instruction-image {
+        max-height: 120px;
+    }
+    
+    .circuit-column-right .elements-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .circuit-column-right .circuit-element-draggable {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .circuit-column-right .circuit-element-draggable .element-img {
+        width: 35px;
+        height: 35px;
     }
 }

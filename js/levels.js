@@ -21,9 +21,9 @@ const LEVELS_CONFIG = [
                     slot3: 'bulb',
                 },
                 slotPositions: {
-                    slot1: { top: '30%', left: '21%' },
-                    slot2: { top: '63%', left: '45%' },
-                    slot3: { top: '30%', left: '67%' },
+                    slot1: { top: '35%', left: '12%' },
+                    slot2: { top: '64%', left: '43%' },
+                    slot3: { top: '35%', left: '74%' },
                 },
                 elements: ["switch", "ammeter", "bulb"]
             },
@@ -39,9 +39,9 @@ const LEVELS_CONFIG = [
                     slot3: 'ammeter',
                 },
                 slotPositions: {
-                    slot1: { top: '30%', left: '21%' },
-                    slot2: { top: '63%', left: '45%' },
-                    slot3: { top: '30%', left: '67%' },
+                    slot1: { top: '35%', left: '12%' },
+                    slot2: { top: '64%', left: '43%' },
+                    slot3: { top: '35%', left: '74%' },
                 },
                 elements: ["switch", "bulb", "ammeter", "resistor"]
             },
@@ -57,9 +57,9 @@ const LEVELS_CONFIG = [
                     slot3: 'switch',
                 },
                 slotPositions: {
-                    slot2: { top: '20%', left: '67%' },
-                    slot1: { top: '74%', left: '43%' },
-                    slot3: { top: '48%', left: '67%' },
+                    slot2: { top: '20%', left: '74%' },
+                    slot1: { top: '75%', left: '42%' },
+                    slot3: { top: '48%', left: '74%' },
                 },
                 elements: ["battery", "bulb", "ammeter", "switch", "resistor"]
             }
@@ -277,6 +277,7 @@ function loadNextTask() {
 }
 
 // Генерация задания для сборки схемы по образцу
+// Генерация задания для сборки схемы по образцу
 function generateAssemblyTask(task, container) {
     container.innerHTML = '';
     
@@ -284,33 +285,31 @@ function generateAssemblyTask(task, container) {
     const taskDiv = document.createElement('div');
     taskDiv.className = 'circuit-assembly-task';
     
-    // Заголовок и описание
-    const headerDiv = document.createElement('div');
-    headerDiv.className = 'assembly-header';
-    headerDiv.innerHTML = `
-        <h3>${task.title}</h3>
-        <p>${task.description}</p>
-    `;
+    // Трехколоночная структура
+    const threeColumnLayout = document.createElement('div');
+    threeColumnLayout.className = 'circuit-three-column-layout';
     
-    // Область с инструкцией
-    const instructionDiv = document.createElement('div');
-    instructionDiv.className = 'instruction-area';
-    instructionDiv.innerHTML = `
-        <div class="instruction-title">
-            <i class="fas fa-eye"></i> Образец для сборки:
-        </div>
-        <div class="instruction-container">
-            <img id="instructionImage" src="${task.instructionImage}" alt="Образец" class="instruction-image">
+    // ЛЕВАЯ колонка: Образец для сборки
+    const leftColumn = document.createElement('div');
+    leftColumn.className = 'circuit-column-left';
+    leftColumn.innerHTML = `
+        <div class="instruction-area">
+            <div class="instruction-title">
+                <i class="fas fa-eye"></i> Образец для сборки:
+            </div>
+            <div class="instruction-container">
+                <img id="instructionImage" src="${task.instructionImage}" alt="Образец" class="instruction-image">
+            </div>
         </div>
     `;
     
-    // Основная игровая область
-    const gameAreaDiv = document.createElement('div');
-    gameAreaDiv.className = 'circuit-game-area';
+    // ЦЕНТРАЛЬНАЯ колонка: Схема для сборки
+    const centerColumn = document.createElement('div');
+    centerColumn.className = 'circuit-column-center';
     
-    // Контейнер схемы
-    const circuitDiv = document.createElement('div');
-    circuitDiv.className = 'circuit-container';
+    // Создаем контейнер схемы
+    const circuitContainer = document.createElement('div');
+    circuitContainer.className = 'circuit-container';
     
     // Изображение схемы
     const circuitImg = document.createElement('img');
@@ -318,9 +317,9 @@ function generateAssemblyTask(task, container) {
     circuitImg.src = task.circuitImage;
     circuitImg.alt = 'Схема';
     circuitImg.className = 'circuit-image';
-    circuitDiv.appendChild(circuitImg);
+    circuitContainer.appendChild(circuitImg);
     
-    // Создаем слоты для элементов
+    // Создаем слоты для элементов (3 слота)
     for (let i = 1; i <= 3; i++) {
         const slotId = `slot${i}`;
         const slotDiv = document.createElement('div');
@@ -334,26 +333,29 @@ function generateAssemblyTask(task, container) {
         hintSpan.textContent = `Слот ${i}`;
         slotDiv.appendChild(hintSpan);
         
-        circuitDiv.appendChild(slotDiv);
+        circuitContainer.appendChild(slotDiv);
     }
     
-    // Контейнер для элементов (под схемой)
-    const elementsContainer = document.createElement('div');
-    elementsContainer.className = 'circuit-elements-container';
-    elementsContainer.innerHTML = `
-        <div class="elements-title">
-            <i class="fas fa-arrows-alt"></i> Перетащите элементы на схему:
+    centerColumn.appendChild(circuitContainer);
+    
+    // ПРАВАЯ колонка: Элементы для перетаскивания
+    const rightColumn = document.createElement('div');
+    rightColumn.className = 'circuit-column-right';
+    rightColumn.innerHTML = `
+        <div class="circuit-elements-container">
+            <div class="elements-title">
+                <i class="fas fa-arrows-alt"></i> Перетащите элементы:
+            </div>
+            <div class="elements-grid" id="circuitElements"></div>
         </div>
-        <div class="elements-grid" id="circuitElements"></div>
     `;
     
-    // Собираем всё вместе
-    gameAreaDiv.appendChild(circuitDiv);
-    gameAreaDiv.appendChild(elementsContainer);
+    // Собираем колонки
+    threeColumnLayout.appendChild(leftColumn);
+    threeColumnLayout.appendChild(centerColumn);
+    threeColumnLayout.appendChild(rightColumn);
     
-    taskDiv.appendChild(instructionDiv);
-    taskDiv.appendChild(gameAreaDiv);
-    
+    taskDiv.appendChild(threeColumnLayout);
     container.appendChild(taskDiv);
     
     // Устанавливаем позиции слотов после рендеринга
@@ -366,7 +368,7 @@ function generateAssemblyTask(task, container) {
         currentGameState.circuitPlacements = {};
         
         // Заполняем контейнер элементов
-        const elementsGrid = elementsContainer.querySelector('.elements-grid');
+        const elementsGrid = rightColumn.querySelector('.elements-grid');
         fillCircuitElements(task.elements, elementsGrid);
         
         // Инициализируем drag and drop
@@ -414,6 +416,8 @@ function fillCircuitElements(elements, container) {
 
 // Функция для установки позиций слотов
 function setSlotPositions(positions) {
+    console.log('Установка позиций слотов:', positions);
+    
     for (const slotId in positions) {
         const slot = document.getElementById(slotId);
         if (slot) {
@@ -423,17 +427,21 @@ function setSlotPositions(positions) {
             slot.style.position = 'absolute';
             slot.style.top = top;
             slot.style.left = left;
-            slot.style.width = '55px';
-            slot.style.height = '55px';
+            slot.style.width = '80px';
+            slot.style.height = '80px';
             slot.style.zIndex = '10';
             
             // Добавляем контур для видимости
             slot.style.border = '2px dashed rgba(0, 210, 255, 0.7)';
-            slot.style.borderRadius = '12px';
+            slot.style.borderRadius = '10px';
             slot.style.backgroundColor = 'rgba(0, 210, 255, 0.08)';
             slot.style.display = 'flex';
             slot.style.alignItems = 'center';
             slot.style.justifyContent = 'center';
+            
+            console.log(`Слот ${slotId} установлен в позицию:`, top, left);
+        } else {
+            console.error(`Слот ${slotId} не найден!`);
         }
     }
 }
@@ -461,6 +469,11 @@ function initCircuitDragAndDrop() {
     
     console.log('Инициализация drag and drop. Элементов:', draggableElements.length, 'Слотов:', dropzones.length);
     
+    // Выводим информацию о слотах
+    dropzones.forEach(slot => {
+        console.log('Слот найден:', slot.id, 'Позиция:', slot.style.top, slot.style.left);
+    });
+    
     // Обработчики для элементов
     draggableElements.forEach(element => {
         element.addEventListener('dragstart', handleCircuitDragStart);
@@ -484,8 +497,9 @@ function initCircuitDragAndDrop() {
         dropzone.addEventListener('dragleave', handleCircuitDragLeave);
         
         // Визуальная обратная связь при наведении
-        dropzone.addEventListener('dragover', function() {
+        dropzone.addEventListener('dragover', function(e) {
             this.classList.add('drag-over');
+            console.log('Перетаскивание над слотом:', this.id);
         });
         
         dropzone.addEventListener('dragleave', function() {
@@ -564,8 +578,11 @@ function handleCircuitDrop(event) {
     const dropzone = event.target.closest('.circuit-slot');
     if (!dropzone) {
         console.error('Цель не является слотом');
+        console.log('Элемент упал на:', event.target);
         return;
     }
+    
+    console.log('Размещение элемента в слоте:', dropzone.id);
     
     // Очищаем слот перед добавлением нового элемента
     dropzone.innerHTML = '';
