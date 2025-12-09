@@ -402,7 +402,7 @@ function fillCircuitElements(elements, container) {
             
             elementDiv.innerHTML = `
                 <div class="element-icon">
-                    <img src="${elementData.img}" alt="${elementData.name}" class="element-img">
+                    <img src="${elementData.img}" alt="${elementData.name}" class="element-img" draggable="false">
                 </div>
                 <div class="element-name">${elementData.name}</div>
             `;
@@ -512,11 +512,29 @@ function initCircuitDragAndDrop() {
 
 // Обработчики событий для drag and drop
 function handleCircuitDragStart(event) {
+    // Разрешаем перетаскивание только самого элемента, а не картинки внутри
+    if (event.target.classList.contains('element-img') || 
+        event.target.classList.contains('element-icon')) {
+        event.preventDefault();
+        return;
+    }
+    
     console.log('Drag start event:', event.target.id);
     
     // Сохраняем данные о перетаскиваемом элементе
     const elementId = event.target.dataset.element;
-    event.dataTransfer.setData('text/plain', elementId);
+    if (!elementId) {
+        // Если кликнули по картинке или иконке, находим родительский элемент
+        const elementDiv = event.target.closest('.circuit-element-draggable');
+        if (!elementDiv) {
+            event.preventDefault();
+            return;
+        }
+        event.dataTransfer.setData('text/plain', elementDiv.dataset.element);
+    } else {
+        event.dataTransfer.setData('text/plain', elementId);
+    }
+    
     event.dataTransfer.effectAllowed = 'move';
     
     // Создаем прозрачное изображение для перетаскивания (призрак)
@@ -529,6 +547,13 @@ function handleCircuitDragStart(event) {
     dragGhost.style.zIndex = '10000';
     dragGhost.id = 'drag-ghost';
     dragGhost.classList.add('dragging-ghost');
+    
+    // Удаляем изображение из призрака, чтобы не было двойных картинок
+    const img = dragGhost.querySelector('.element-img');
+    if (img) {
+        img.style.display = 'none';
+    }
+    
     document.body.appendChild(dragGhost);
     
     // Используем призрак как изображение для перетаскивания
@@ -626,7 +651,7 @@ function createPlacedElement(elementType) {
     
     placedElement.innerHTML = `
         <div class="placed-element-icon">
-            <img src="${imgSrc}" alt="" class="placed-element-img">
+            <img src="${imgSrc}" alt="" class="placed-element-img" draggable="false">
         </div>
         <div class="delete-placed-element" title="Удалить элемент">×</div>
     `;
@@ -1027,7 +1052,26 @@ function getElementName(elementId) {
     };
     return names[elementId] || elementId;
 }
+// Глобальный запрет перетаскивания картинок
+document.addEventListener('dragstart', function(event) {
+    // Если перетаскивается картинка (не элемент схемы)
+    if (event.target.tagName === 'IMG' && 
+        !event.target.closest('.circuit-element-draggable') &&
+        !event.target.closest('.placed-element')) {
+        event.preventDefault();
+        return false;
+    }
+});
 
+// Также для touch событий
+document.addEventListener('touchstart', function(event) {
+    if (event.target.tagName === 'IMG' && 
+        !event.target.closest('.circuit-element-draggable') &&
+        !event.target.closest('.placed-element')) {
+        event.preventDefault();
+        return false;
+    }
+}, { passive: false });
 function getElementIcon(elementId) {
     const icons = {
         'battery': '🔋',
@@ -1048,3 +1092,4 @@ window.loadNextTask = loadNextTask;
 window.currentGameState = currentGameState;
 window.LEVELS_CONFIG = LEVELS_CONFIG;
 window.updateAttemptsDisplay = updateAttemptsDisplay;
+

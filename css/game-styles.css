@@ -1310,3 +1310,28 @@ body.dragging {
         height: 35px;
     }
 }
+
+/* Запрет перетаскивания картинок */
+.element-img, 
+.placed-element-img,
+.instruction-image,
+.circuit-image {
+    pointer-events: none; /* Отключаем события мыши */
+    user-drag: none; /* Стандарт */
+    -webkit-user-drag: none; /* Chrome, Safari */
+    -moz-user-drag: none; /* Firefox */
+    -ms-user-drag: none; /* IE/Edge */
+    user-select: none; /* Запрет выделения */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Разрешаем перетаскивание только контейнеру */
+.circuit-element-draggable {
+    cursor: grab;
+}
+
+.circuit-element-draggable:active {
+    cursor: grabbing;
+}
