@@ -536,7 +536,7 @@
     align-items: center;
     gap: 20px;
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
 }
 
 /* Чистая формула с полями ввода */
@@ -706,8 +706,8 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin: 20px 0;
-    max-width: 700px;
-    width: 100%;
+    max-width: 1000px;
+    
 }
 
 .answer-option {
@@ -1334,4 +1334,90 @@ body.dragging {
 
 .circuit-element-draggable:active {
     cursor: grabbing;
+}
+
+/* Стили для сложных вопросов (уровень 3) */
+.quiz-instruction {
+    background: rgba(255, 167, 38, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 3px solid var(--warning-color);
+    font-size: 0.9rem;
+    color: #ffcc80;
+}
+
+.quiz-instruction i {
+    color: var(--warning-color);
+    margin-right: 8px;
+}
+
+
+
+.answer-checkbox {
+    width: 35px;
+    height: 35px;
+    background: rgba(0, 210, 255, 0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    color: rgba(0, 210, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+.answer-option.selected .answer-checkbox {
+    background: var(--accent-color);
+    color: white;
+}
+
+.answer-checkbox .fa-check-square {
+    color: var(--success-color);
+}
+
+/* Длинные ответы (для сложных расчетов) */
+.answer-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Для сложных формул (уровень 2) */
+.formula-with-inputs-clean.complex {
+    min-width: 500px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(0, 210, 255, 0.2);
+}
+
+.formula-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.formula-equation {
+    font-size: 1.2rem;
+    color: #aaa;
+    font-style: italic;
+    margin: 0 15px;
+}
+
+/* Адаптивность для сложных формул */
+@media (max-width: 768px) {
+    .formula-with-inputs-clean.complex {
+        min-width: 90%;
+        padding: 15px;
+    }
+    
+    .formula-row {
+        flex-wrap: wrap;
+    }
+    
+    .answers.multiple-choice .answer-text {
+        font-size: 0.9rem;
+    }
 }

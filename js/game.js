@@ -826,8 +826,56 @@ function checkCalculationTask() {
     return allCorrect;
 }
 // Проверка теста
+// Проверка теста (обновленная для множественного выбора)
 function checkQuizTask() {
-    return currentGameState.selectedAnswer === currentGameState.correctAnswer;
+    const isMultiple = currentGameState.isMultipleChoice === true;
+    
+    if (isMultiple) {
+        // Для множественного выбора
+        const selectedOptions = currentGameState.selectedAnswers || [];
+        
+        if (selectedOptions.length === 0) {
+            showMessage('Выберите хотя бы один вариант ответа!', 'error');
+            return false;
+        }
+        
+        const correctAnswers = Array.isArray(currentGameState.correctAnswer) 
+            ? currentGameState.correctAnswer 
+            : [currentGameState.correctAnswer];
+        
+        // Проверяем, что выбраны все правильные и нет неправильных
+        let allCorrect = true;
+        
+        // Проверяем все выбранные ответы
+        selectedOptions.forEach(selectedIndex => {
+            if (!correctAnswers.includes(selectedIndex)) {
+                allCorrect = false;
+            }
+        });
+        
+        // Проверяем, что все правильные ответы выбраны
+        correctAnswers.forEach(correctIndex => {
+            if (!selectedOptions.includes(correctIndex)) {
+                allCorrect = false;
+            }
+        });
+        
+        return allCorrect;
+        
+    } else {
+        // Для одиночного выбора (старая логика)
+        const selectedOption = document.querySelector('.answer-option.selected');
+        
+        if (!selectedOption) {
+            showMessage('Выберите вариант ответа!', 'error');
+            return false;
+        }
+        
+        const userAnswer = parseInt(selectedOption.dataset.index);
+        const correctAnswer = currentGameState.correctAnswer;
+        
+        return userAnswer === correctAnswer;
+    }
 }
 
 // Очистка рабочей области

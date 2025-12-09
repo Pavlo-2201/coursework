@@ -65,56 +65,60 @@ const LEVELS_CONFIG = [
         baseScore: 100
     },
     {
-    id: 2,
-    name: "Расчеты",
-    type: "calculation",
-    timePerTask: 120,
-    attempts: 3,
-    tasks: [
-        {
-            id: 1,
-            question: "Рассчитайте силу тока в цепи с напряжением 12В и сопротивлением 4Ом",
-            formula: "I = U / R",
-            variables: {
-                'U': { value: 12, unit: 'В' },
-                'R': { value: 4, unit: 'Ом' }
+        id: 2,
+        name: "Расчеты",
+        type: "calculation",
+        timePerTask: 120,
+        attempts: 3,
+        tasks: [
+            {
+                id: 1,
+                question: "Рассчитайте силу тока в цепи с напряжением 12В и сопротивлением 4Ом",
+                formula: "I = U / R",
+                variables: {
+                    'U': { value: 12, unit: 'В' },
+                    'R': { value: 4, unit: 'Ом' }
+                },
+                targetVariable: 'I',
+                targetUnit: 'А',
+                answer: 3
             },
-            targetVariable: 'I',
-            targetUnit: 'А',
-            answer: 3
-        },
-        {
-            id: 2,
-            question: "Рассчитайте напряжение в цепи с силой тока 0.5А и сопротивлением 24Ом",
-            formula: "U = I * R",
-            variables: {
-                'I': { value: 0.5, unit: 'А' },
-                'R': { value: 24, unit: 'Ом' }
+            // ВТОРОЕ ЗАДАНИЕ - СЛОЖНЕЕ (было: U = I * R)
+            {
+                id: 2,
+                question: "Рассчитайте мощность цепи, если напряжение 24В, сила тока 0.5А, сопротивление 48Ом",
+                formula: "P = U * I = I² * R ",
+                variables: {
+                    'U': { value: 24, unit: 'В' },
+                    'I': { value: 0.5, unit: 'А' },
+                    'R': { value: 48, unit: 'Ом' }
+                },
+                targetVariable: 'P',
+                targetUnit: 'Вт',
+                answer: 12 // P = U * I = 24 * 0.5 = 12 Вт
             },
-            targetVariable: 'U',
-            targetUnit: 'В',
-            answer: 12
-        },
-        {
-            id: 3,
-            question: "Рассчитайте сопротивление цепи с напряжением 9В и силой тока 0.3А",
-            formula: "R = U / I",
-            variables: {
-                'U': { value: 9, unit: 'В' },
-                'I': { value: 0.3, unit: 'А' }
-            },
-            targetVariable: 'R',
-            targetUnit: 'Ом',
-            answer: 30
-        }
-    ],
-    baseScore: 150
+            // ТРЕТЬЕ ЗАДАНИЕ - ЕЩЕ СЛОЖНЕЕ (было: R = U / I)
+            {
+                id: 3,
+                question: "Рассчитайте общее сопротивление параллельной цепи: R1=6Ом, R2=12Ом, R3=4Ом",
+                formula: "1/R = 1/R1 + 1/R2 + 1/R3",
+                variables: {
+                    'R1': { value: 6, unit: 'Ом' },
+                    'R2': { value: 12, unit: 'Ом' },
+                    'R3': { value: 4, unit: 'Ом' }
+                },
+                targetVariable: 'R',
+                targetUnit: 'Ом',
+                answer: 2 // 1/R = 1/6 + 1/12 + 1/4 = 1/2 → R = 2 Ом
+            }
+        ],
+        baseScore: 150
     },
     {
         id: 3,
         name: "Теория",
         type: "quiz",
-        timePerTask: 90, // 1.5 минуты на задание
+        timePerTask: 90,
         attempts: 3,
         tasks: [
             {
@@ -122,33 +126,36 @@ const LEVELS_CONFIG = [
                 question: "Для чего нужен резистор в электрической цепи?",
                 answers: [
                     "Для ограничения тока",
-                    "Для увеличения напряжения",
+                    "Для увеличения напряжения", 
                     "Для хранения энергии",
                     "Для переключения цепи"
                 ],
                 correct: 0
             },
+            // ВТОРОЕ ЗАДАНИЕ - СЛОЖНЕЕ (больше вариантов)
             {
                 id: 2,
-                question: "Какой элемент преобразует электрическую энергию в свет?",
+                question: "Выберите ВСЕ правильные утверждения о законе Ома:",
                 answers: [
-                    "Лампа накаливания",
-                    "Резистор",
-                    "Конденсатор",
-                    "Трансформатор"
+                    "Сила тока прямо пропорциональна напряжению",
+                    "Сопротивление измеряется в Омах",
+                    "При последовательном соединении напряжения складываются",
+                    "Закон Ома применяется только для постоянного тока"
                 ],
-                correct: 0
+                correct: [0, 1, 2], // Несколько правильных ответов!
+                multiple: true // Флаг множественного выбора
             },
+            // ТРЕТЬЕ ЗАДАНИЕ - ЕЩЕ СЛОЖНЕЕ (сложный вопрос)
             {
                 id: 3,
-                question: "Что измеряется в Омах?",
+                question: "В цепи с последовательным соединением: R1=10Ом, R2=20Ом, Uобщ=60В. Рассчитайте:",
                 answers: [
-                    "Сопротивление",
-                    "Напряжение",
-                    "Сила тока",
-                    "Мощность"
+                    "Общее сопротивление: 30 Ом, ток: 2 А, U1: 20 В, U2: 40 В",
+                    "Общее сопротивление: 30 Ом, ток: 2 А, U1: 10 В, U2: 50 В", 
+                    "Общее сопротивление: 30 Ом, ток: 3 А, U1: 30 В, U2: 30 В",
+                    "Общее сопротивление: 15 Ом, ток: 4 А, U1: 40 В, U2: 20 В"
                 ],
-                correct: 0
+                correct: 0 // Rобщ = 10+20=30 Ом, I=60/30=2 А, U1=2*10=20 В, U2=2*20=40 В
             }
         ],
         baseScore: 120
@@ -720,7 +727,7 @@ function generateCalculationTask(task, container) {
             input.dataset.variable = trimmedPart;
             if (isTarget) input.dataset.isTarget = 'true';
             input.placeholder = '?';
-            input.step = '0.01';
+            input.step = '1';
             
             // Метка переменной (над полем)
             const label = document.createElement('div');
@@ -921,12 +928,37 @@ function updateFormulaProgressClean() {
 
 
 // Генерация задания для теории
+// Генерация задания для теории с поддержкой множественного выбора
 function generateQuizTask(task, container) {
-    container.innerHTML = `
-        <div class="quiz-task">
-            <h3>Теоретический вопрос</h3>
-            <div class="question">${task.question}</div>
-            <div class="answers">
+    container.innerHTML = '';
+    
+    const isMultiple = task.multiple === true;
+    const correctAnswers = Array.isArray(task.correct) ? task.correct : [task.correct];
+    
+    const quizDiv = document.createElement('div');
+    quizDiv.className = 'quiz-task';
+    
+    let answersHTML = '';
+    
+    if (isMultiple) {
+        answersHTML = `
+            <div class="quiz-instruction">
+                <i class="fas fa-info-circle"></i> Выберите ВСЕ правильные варианты (может быть несколько):
+            </div>
+            <div class="answers multiple-choice">
+                ${task.answers.map((answer, index) => `
+                    <div class="answer-option" data-index="${index}">
+                        <span class="answer-checkbox">
+                            <i class="far fa-square"></i>
+                        </span>
+                        <span class="answer-text">${answer}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        answersHTML = `
+            <div class="answers single-choice">
                 ${task.answers.map((answer, index) => `
                     <div class="answer-option" data-index="${index}">
                         <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
@@ -934,21 +966,75 @@ function generateQuizTask(task, container) {
                     </div>
                 `).join('')}
             </div>
-        </div>
+        `;
+    }
+    
+    quizDiv.innerHTML = `
+        <h3>Теоретический вопрос</h3>
+        <div class="question">${task.question}</div>
+        ${answersHTML}
     `;
+    
+    container.appendChild(quizDiv);
     
     // Сохраняем правильный ответ
     currentGameState.correctAnswer = task.correct;
+    currentGameState.isMultipleChoice = isMultiple;
+    currentGameState.selectedAnswers = [];
     
     // Добавляем обработчики для вариантов ответа
     setTimeout(() => {
         document.querySelectorAll('.answer-option').forEach(option => {
             option.addEventListener('click', function() {
-                document.querySelectorAll('.answer-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                currentGameState.selectedAnswer = parseInt(this.dataset.index);
+                const index = parseInt(this.dataset.index);
+                
+                if (isMultiple) {
+                    // Множественный выбор - переключаем чекбокс
+                    const isSelected = this.classList.contains('selected');
+                    
+                    if (isSelected) {
+                        this.classList.remove('selected');
+                        const checkbox = this.querySelector('.fa-square');
+                        if (checkbox) {
+                            checkbox.className = 'far fa-square';
+                        }
+                        
+                        // Удаляем из выбранных
+                        const idx = currentGameState.selectedAnswers.indexOf(index);
+                        if (idx > -1) {
+                            currentGameState.selectedAnswers.splice(idx, 1);
+                        }
+                    } else {
+                        this.classList.add('selected');
+                        const checkbox = this.querySelector('.fa-square');
+                        if (checkbox) {
+                            checkbox.className = 'fas fa-check-square';
+                        }
+                        
+                        // Добавляем в выбранные
+                        if (!currentGameState.selectedAnswers.includes(index)) {
+                            currentGameState.selectedAnswers.push(index);
+                        }
+                    }
+                } else {
+                    // Одиночный выбор - снимаем выделение с других
+                    document.querySelectorAll('.answer-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                        const letter = opt.querySelector('.answer-letter');
+                        if (letter) {
+                            letter.style.background = 'rgba(0, 210, 255, 0.2)';
+                        }
+                    });
+                    
+                    this.classList.add('selected');
+                    const letter = this.querySelector('.answer-letter');
+                    if (letter) {
+                        letter.style.background = 'var(--accent-color)';
+                        letter.style.color = 'white';
+                    }
+                    
+                    currentGameState.selectedAnswer = index;
+                }
             });
         });
     }, 100);
